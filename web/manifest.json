@@ -1,6 +1,6 @@
 {
-    "name": "the_project",
-    "short_name": "the_project",
+    "name": "qrabsen",
+    "short_name": "qrabsen",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

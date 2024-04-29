@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "122623884296",
+    "project_id": "qrabsen2",
+    "storage_bucket": "qrabsen2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122623884296:android:503be5a23403d0582825bd",
+        "android_client_info": {
+          "package_name": "com.example.qrabsen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwKNw_VEP5N9u3taHFssqn_LaPDsEI5n4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
