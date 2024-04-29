@@ -7,7 +7,7 @@ import 'package:qrabsen/view/test.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:qrabsen/api/firebase_api.dart';
+import 'package:qrabsen/services/get_token.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

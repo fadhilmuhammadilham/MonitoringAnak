@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
+import 'package:qrabsen/services/firebase_profil.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -9,6 +10,98 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  void openBottomSheet() {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) {
+          return Container(
+            decoration: BoxDecoration(boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 4,
+                offset: Offset(0, -2),
+              )
+            ], color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            padding: EdgeInsets.only(top: 20),
+            height: MediaQuery.of(context).size.height * 0.5,
+            child: Center(
+                child: Column(
+              children: <Widget>[
+                Text(
+                  'QR PROFIL',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                SizedBox(
+                  height: 30,
+                ),
+                Icon(
+                  FontAwesomeIcons.qrcode,
+                  size: 250,
+                )
+              ],
+            )),
+          );
+        });
+  }
+
+  final ProfilService profilService = ProfilService();
+
+  final TextEditingController namaController = TextEditingController();
+  final TextEditingController telpController = TextEditingController();
+
+  void openDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Container(
+          height: MediaQuery.of(context).size.height * 0.3,
+          padding: EdgeInsets.all(10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Masukan Data',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Nama',
+                ),
+                controller: namaController,
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'No.Telp',
+                ),
+                controller: telpController,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Close')),
+          ElevatedButton(
+              onPressed: () {
+                profilService.addProfile(
+                    namaController.text, telpController.text);
+                namaController.clear();
+                telpController.clear();
+                Navigator.pop(context);
+              },
+              child: Text('Save'))
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,43 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   SizedBox(height: 10),
                   InkWell(
-                    onTap: () {
-                      showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 4,
-                                      offset: Offset(0, -2),
-                                    )
-                                  ],
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20)),
-                              padding: EdgeInsets.only(top: 20),
-                              height: MediaQuery.of(context).size.height * 0.5,
-                              child: Center(
-                                  child: Column(
-                                children: <Widget>[
-                                  Text(
-                                    'QR PROFIL',
-                                    style: TextStyle(color: Colors.grey),
-                                  ),
-                                  SizedBox(
-                                    height: 30,
-                                  ),
-                                  Icon(
-                                    FontAwesomeIcons.qrcode,
-                                    size: 250,
-                                  )
-                                ],
-                              )),
-                            );
-                          });
-                    },
+                    onTap: openBottomSheet,
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -260,6 +317,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               width: 5,
                             ),
                             InkWell(
+                              onTap: openDialog,
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Colors.white,
