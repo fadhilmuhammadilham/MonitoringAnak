@@ -3,7 +3,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:qrabsen/view/homePage.dart';
 import 'package:qrabsen/view/profilePage.dart';
 import 'package:qrabsen/view/rekapPage.dart';
-import 'package:qrabsen/view/test.dart';
+// import 'package:qrabsen/view/test.dart';
 // import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +33,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> widgets = [HomePage(), RekapPage(), ProfilePage(), TestPage()];
+    List<Widget> widgets = [HomePage(), RekapPage(), ProfilePage()];
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -47,7 +47,6 @@ class _MyAppState extends State<MyApp> {
               TabItem(icon: Icons.home, title: 'Home'),
               TabItem(icon: Icons.map, title: 'Rekap'),
               TabItem(icon: Icons.people, title: 'Profile'),
-              TabItem(icon: Icons.people, title: 'Test'),
             ],
             onTap: (int i) {
               setState(() {

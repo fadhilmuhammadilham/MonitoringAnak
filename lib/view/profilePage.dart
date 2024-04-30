@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_icon_class/font_awesome_icon_class.dart';
 import 'package:qrabsen/services/firebase_profil.dart';
@@ -50,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final TextEditingController namaController = TextEditingController();
   final TextEditingController telpController = TextEditingController();
 
-  void openDialog() {
+  void openDialog({String? docId}) async {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -70,14 +71,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 controller: namaController,
               ),
-              SizedBox(
-                height: 5,
-              ),
               TextField(
                 decoration: InputDecoration(
                   labelText: 'No.Telp',
                 ),
                 controller: telpController,
+                keyboardType: TextInputType.phone,
               ),
             ],
           ),
@@ -90,8 +89,17 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Text('Close')),
           ElevatedButton(
               onPressed: () {
-                profilService.addProfile(
-                    namaController.text, telpController.text);
+                //new data
+                if (docId == null) {
+                  profilService.addProfile(
+                      namaController.text, telpController.text);
+                }
+                //update data
+                else {
+                  profilService.updateProfile(
+                      docId, namaController.text, telpController.text);
+                }
+
                 namaController.clear();
                 telpController.clear();
                 Navigator.pop(context);
@@ -294,107 +302,226 @@ class _ProfilePageState extends State<ProfilePage> {
                   SizedBox(
                     height: 20,
                   ),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Nama',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              'Goo Youn Jung',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            InkWell(
-                              onTap: openDialog,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(100),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
+                  StreamBuilder(
+                    stream: profilService.getProfilesStream(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasData) {
+                        QuerySnapshot querySnapshot =
+                            snapshot.data as QuerySnapshot;
+                        if (querySnapshot.docs.isNotEmpty) {
+                          String nama = querySnapshot.docs[0]['Nama'];
+                          String docId = querySnapshot.docs[0].id;
+                          return Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'Nama',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Text(
+                                      nama,
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        openDialog(docId: docId);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        height: 25,
+                                        width: 25,
+                                        child: Icon(
+                                          Icons.edit,
+                                          size: 18,
+                                          color: Color(0xFFADD8E6),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                                height: 25,
-                                width: 25,
-                                child: Icon(
-                                  Icons.edit,
-                                  size: 18,
-                                  color: Color(0xFFADD8E6),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Nama Belum Tersedia',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              InkWell(
+                                onTap: openDialog,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  height: 25,
+                                  width: 25,
+                                  child: Icon(
+                                    FontAwesomeIcons.plus,
+                                    size: 18,
+                                    color: Color(0xFFADD8E6),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          );
+                        }
+                      } else {
+                        return Text(
+                          'Tidak Ada Data',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        );
+                      }
+                    },
                   ),
                   Divider(),
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'No.Telp',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        Row(
-                          children: <Widget>[
-                            Text(
-                              '087730341110',
-                              style: TextStyle(
-                                fontSize: 18,
-                              ),
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            InkWell(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(100),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.5),
-                                      spreadRadius: 2,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
+                  StreamBuilder(
+                    stream: profilService.getProfilesStream(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasData) {
+                        QuerySnapshot querySnapshot =
+                            snapshot.data as QuerySnapshot;
+                        if (querySnapshot.docs.isNotEmpty) {
+                          String nomorTelp = querySnapshot.docs[0]['noTelp'];
+                          String docId = querySnapshot.docs[0].id;
+                          return Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  'No.Telp',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                Row(
+                                  children: <Widget>[
+                                    Text(
+                                      nomorTelp,
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        openDialog(docId: docId);
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 2,
+                                              blurRadius: 4,
+                                              offset: Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        height: 25,
+                                        width: 25,
+                                        child: Icon(
+                                          Icons.edit,
+                                          size: 18,
+                                          color: Color(0xFFADD8E6),
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
-                                height: 25,
-                                width: 25,
-                                child: Icon(
-                                  Icons.edit,
-                                  size: 18,
-                                  color: Color(0xFFADD8E6),
+                              ],
+                            ),
+                          );
+                        } else {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'No.Telp Belum Tersedia',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              InkWell(
+                                onTap: openDialog,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(100),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.5),
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                        offset: Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  height: 25,
+                                  width: 25,
+                                  child: Icon(
+                                    FontAwesomeIcons.plus,
+                                    size: 18,
+                                    color: Color(0xFFADD8E6),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          );
+                        }
+                      } else {
+                        return Text(
+                          'Tidak Ada Data',
+                          style: TextStyle(
+                            fontSize: 18,
+                          ),
+                        );
+                      }
+                    },
                   ),
                   Divider(),
                   SizedBox(
