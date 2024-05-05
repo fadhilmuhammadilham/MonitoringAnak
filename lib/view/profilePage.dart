@@ -194,7 +194,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 image: DecorationImage(
                     image: AssetImage('images/profil/Body.png'),
                     fit: BoxFit.cover),
-                // color: Color(0xFFF4FFFF),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
